@@ -55,15 +55,15 @@ M<-abs(cor(training[sapply(training, function(x) !is.factor(x))]))
 To remove corelation with itself we use below function to put all the diagnol value to 0
 diag(M)<-0
 
-To visualize the correlation between different variable we use below function. I have added my corrplot with readme.md as file name co.jpeg. Blue line show the variables with highest correlation and red show least correlation 
+To visualize the correlation between different variable we use below function. I have added my corrplot with readme.md as file name corrplot.jpeg. Blue line show the variables with highest correlation and red show least correlation.
 
 corrplot(M,type="lower")
 
 ##### We pre-process our data using a principal component analysis in caret package, leaving out last column classe. After pre-processing we use 'predict' function to apply pca on test and training data.
 
-preProc<- preProcess(training[, -60], method = "pca", thresh = 0.99)
-trainPC<-predict(preProc,training[,-60])
-validPC<-predict(preProc,validation[,-60])
+preProc<- preProcess(training[, -53], method = "pca", thresh = 0.99)
+trainPC<-predict(preProc,training[,-53])
+validPC<-predict(preProc,validation[,-53])
 
 Now use random forest to train the model on training data using classe variable. We have used randomForest instead of train function as train function takes more time.
 
@@ -73,7 +73,7 @@ modelFit<-randomForest(training$classe ~.,data=trainPC,importance=TRUE)
 
 print(modelFit)
 importance(modelFit)
-varImpPlot(modelFit,sort=TRUE,main="principal components")
+varImpPlot(modelFit$finalModel,sort=TRUE,main="principal components")
 
 #### For validating model on validation data and how the model actually fit we predict our result on validation data.
 pred_valid<-predict(modelFit,validPC)
