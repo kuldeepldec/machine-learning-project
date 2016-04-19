@@ -52,7 +52,10 @@ M<-abs(cor(sf1[sapply(sf1, function(x) !is.factor(x))]))
 To remove corelation with itself we use below function 
 diag(M)<-0
 
-to visaulize the data 
+to visaulize the correlation between different variable we use below function. I have added my corrplot with readme.md in 
+
+corrplot(M,type="lower")
+
 
 
 
