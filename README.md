@@ -47,9 +47,9 @@ inTrain<-createDataPartition(y = dftrain$classe, p = 0.7, list = FALSE)
 training<-dftrain[inTrain,]
 validation<-dftrain[-inTrain,]
 
-#### pre process data with PCA and visualizing correlation in training data. The reason for doing pca was it help in reducing predictor variables and getting same accuracy as trainging data with more variable.
+#### pre process data with PCA and visualizing correlation in training data. The reason for doing pca was it help in reducing predictor variables and getting same accuracy as training data with more variable.
 
-To visualize correlation in data we have to remove user name, timestamp and classe data. So we created new data with predictors using subset function. 
+To visualize correlation in data we have to find corelation between predictor variables 
 M<-abs(cor(training[sapply(training, function(x) !is.factor(x))]))
 
 To remove corelation with itself we use below function to put all the diagnol value to 0
@@ -84,9 +84,13 @@ confusion$table
 accur <- postResample(validation$classe, pred_valid)
 outSamperror<-1-accur[[1]]
 
-The estimated accuracy of the model is 99.37% and the estimated out-of-sample error based on fitted model applied to the cross validation data is 0.63%.
+The estimated accuracy of the model is 98.07% and the estimated out-of-sample error based on fitted model applied to the cross validation data is 1.92%.
 
+##### final test on test data set, so first we pre-process our data set and remove last column of problem_id. We ran our result on test data set and predict result
+testPC <- predict(preProc, dftest[,-53])
+predFinal <- predict(modelFit, testPC)
 
+I have shown final result in a final_result.jpeg, showing my confusion matrix and final predicted result
 
 
 
