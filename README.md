@@ -20,6 +20,7 @@ The data for this project come from this source: http://groupware.les.inf.puc-ri
 ####Summary of raw training and testing data set and installing libraries for the project 
 library(caret)
 library(corrplot)
+library(randomForest)
 
 In data there were lot of columns with NA and Div/0! showing missing values. So removing these columns and rows are important before we perform any analysis.
 
@@ -43,18 +44,41 @@ inTrain<-createDataPartition(y = dftrain$classe, p = 0.7, list = FALSE)
 training<-dftrain[inTrain,]
 validation<-dftrain[-inTrain,]
 
-#### pre process data with PCA and visualizing correlation in training data
+#### pre process data with PCA and visualizing correlation in training data. The reason for doing pca was it help in reducing predictor variables and getting same accuracy as trainging data with more variable.
 
 To visualize correlation in data we have to remove user name, timestamp and classe data. So we created new data with predictors using subset function. 
-sf1<-subset(train,select=c(8:92))
+sf1<-subset(training,select=c(8:92))
 M<-abs(cor(sf1[sapply(sf1, function(x) !is.factor(x))]))
 
-To remove corelation with itself we use below function 
+To remove corelation with itself we use below function to put all the diagnol value to 0
 diag(M)<-0
 
-to visaulize the correlation between different variable we use below function. I have added my corrplot with readme.md in 
+to visaulize the correlation between different variable we use below function. I have added my corrplot with readme.md as file name co.jpeg. Blue line show the variables with highest correlation and red show least correlation 
 
 corrplot(M,type="lower")
+
+We pre-process our data using a principal component analysis in caret package, leaving out last column classe. After pre-processing we use 'predict' function to apply pca on test and training data.
+
+preProc<- preProcess(training[, -60], method = "pca", thresh = 0.99)
+trainPC<-predict(preProc,training[,-60])
+validPC<-predict(preProc,validation[,-60])
+
+Now use random forest to train the model on training data using classe variable. We have used randomForest instead of train function as train function takes more time.
+
+modelFit<-randomForest(training$classe ~.,data=trainPC,importance=TRUE)
+
+We can visualize the confusion matrix and variable importance from below functions. We have attached principal component importance plot in princ
+
+print(modelFit)
+importance(modelFit)
+varImpPlot(modelFit,sort=TRUE,main="principal components")
+
+
+
+
+
+
+
 
 
 
