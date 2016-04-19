@@ -1,0 +1,91 @@
+this file shows analysis done on R.  
+### reading test and train data in R
+train <- read.csv('pml-training.csv',header=TRUE,na.strings=c('#DIV/0!', '', 'NA'))
+test <- read.csv('pml-testing.csv',header=TRUE,na.strings=c('#DIV/0!', '', 'NA')) 
+
+####removing na in test and train data
+dftrain<-train[, colSums(is.na(train))==0]
+
+dftest<-test[, colSums(is.na(test))==0]
+
+sum(test=='#DIV/0!',na.rm=TRUE)
+[1] 0 
+
+sum(test=='#DIV/0!',na.rm=TRUE)
+[1] 0
+#### removing time stamp data
+dftrain<-subset(dftrain,select=c(8:60))
+
+dftest<-subset(dftest,select=c(8:60))
+#### dividing data into training and validation data
+inTrain<-createDataPartition(y = dftrain$classe, p = 0.7, list = FALSE)
+
+training<-dftrain[inTrain,]
+
+
+validation<-dftrain[-inTrain,]
+
+#### preprocessing data with PCA
+preProc<- preProcess(training[, -53], method = "pca", thresh = 0.99
+
+trainPC<-predict(preProc,training[,-53])
+
+validPC<-predict(preProc,validation[,-53])
+
+##### train the training data and its output on training data
+modelFit<-randomForest(training$classe ~.,data=trainPC,importance=TRUE)
+
+print(modelFit)
+
+Call:   #### output of modelfit
+ randomForest(formula = training$classe ~ ., data = trainPC, importance = TRUE) 
+               Type of random forest: classification
+                     Number of trees: 500
+No. of variables tried at each split: 6
+
+        OOB estimate of  error rate: 2.19%
+Confusion matrix:
+     A    B    C    D    E class.error
+A 3888   11    2    4    1 0.004608295
+B   50 2575   28    1    4 0.031226486
+C    2   28 2342   22    2 0.022537563
+D    3    2   88 2149   10 0.045737123
+E    0   11   16   16 2482 0.017029703
+
+#### validated result on validation data with accuracy and outof sample error
+pred_valid<-predict(modelFit,validPC)
+
+confusion<-confusionMatrix(validation$classe,pred_valid)
+
+confusion1$table
+
+          Reference 
+Prediction    A    B    C    D    E
+         A 1669    3    1    1    0
+         B   21 1105   11    2    0
+         C    1   13 1010    1    1
+         D    0    0   41  921    2
+         E    0    3    5    7 1067
+
+
+accur1<- postResample(validation$classe, pred_valid1)
+
+accur1
+
+ Accuracy     Kappa 
+0.9807986 0.9757034 
+
+outSamperror<-1-accur1[[1]]
+outSamperror 
+[1] 0.01920136
+
+#### Final testing on test data
+
+testPC <- predict(preProc, dftest[,-53])
+pred_final1 <- predict(modelFit, testPC)
+pred_final1
+1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+ B  A  B  A  A  C  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+Levels: A B C D E
+
+
