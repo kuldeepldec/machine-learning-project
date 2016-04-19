@@ -34,9 +34,12 @@ We can check if 'NA' and '#Div/0! values are removed by
 sum(train=='#DIV/0!', na.rm=TRUE)
 sum(test=='#DIV/0!',na.rm=TRUE)
 
-Next we trim our columns, as columns with removed NA's are blank.
+Next we trim our columns, as columns with removed NA's are blank and removing timestamp and user name data.
 dftrain<-train[, colSums(is.na(train))==0]
 dftest<-test[, colSums(is.na(test))==0]
+
+dftrain<-subset(dftrain,select=c(8:60))
+dftest<-subset(dftest,select=c(8:60))
 
 
 #### We now split our clean training data into two parts training data and cross validation data.
@@ -47,8 +50,7 @@ validation<-dftrain[-inTrain,]
 #### pre process data with PCA and visualizing correlation in training data. The reason for doing pca was it help in reducing predictor variables and getting same accuracy as trainging data with more variable.
 
 To visualize correlation in data we have to remove user name, timestamp and classe data. So we created new data with predictors using subset function. 
-sf1<-subset(training,select=c(8:92))
-M<-abs(cor(sf1[sapply(sf1, function(x) !is.factor(x))]))
+M<-abs(cor(training[sapply(training, function(x) !is.factor(x))]))
 
 To remove corelation with itself we use below function to put all the diagnol value to 0
 diag(M)<-0
