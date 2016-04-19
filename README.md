@@ -49,10 +49,10 @@ validation<-dftrain[-inTrain,]
 
 #### pre process data with PCA and visualizing correlation in training data. The reason for doing pca was it help in reducing predictor variables and getting same accuracy as training data with more variable.
 
-To visualize correlation in data we have to find corelation between predictor variables 
+To visualize correlation in data we have to find correlation between predictor variables 
 M<-abs(cor(training[sapply(training, function(x) !is.factor(x))]))
 
-To remove corelation with itself we use below function to put all the diagnol value to 0
+To remove correlation with itself we use below function to put all the diagnol value to 0
 diag(M)<-0
 
 To visualize the correlation between different variable we use below function. I have added my corrplot with readme.md as file name corrplot.jpeg. Blue line show the variables with highest correlation and red show least correlation.
@@ -90,7 +90,7 @@ The estimated accuracy of the model is 98.07% and the estimated out-of-sample er
 testPC <- predict(preProc, dftest[,-53])
 predFinal <- predict(modelFit, testPC)
 
-I have shown final result in a final_result.jpeg, showing my confusion matrix and final predicted result
+####I have shown final result in a final_result.jpeg, showing my confusion matrix and final predicted result
 
 
 
