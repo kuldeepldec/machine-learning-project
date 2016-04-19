@@ -36,7 +36,7 @@ sum(test=='#DIV/0!',na.rm=TRUE)
 
 Next we trim our columns, as columns with removed NA's are blank.
 dftrain<-train[, colSums(is.na(train))==0]
-dftest<-train[, colSums(is.na(train))==0]
+dftest<-test[, colSums(is.na(test))==0]
 
 
 #### We now split our clean training data into two parts training data and cross validation data.
@@ -53,11 +53,11 @@ M<-abs(cor(sf1[sapply(sf1, function(x) !is.factor(x))]))
 To remove corelation with itself we use below function to put all the diagnol value to 0
 diag(M)<-0
 
-to visaulize the correlation between different variable we use below function. I have added my corrplot with readme.md as file name co.jpeg. Blue line show the variables with highest correlation and red show least correlation 
+To visualize the correlation between different variable we use below function. I have added my corrplot with readme.md as file name co.jpeg. Blue line show the variables with highest correlation and red show least correlation 
 
 corrplot(M,type="lower")
 
-We pre-process our data using a principal component analysis in caret package, leaving out last column classe. After pre-processing we use 'predict' function to apply pca on test and training data.
+##### We pre-process our data using a principal component analysis in caret package, leaving out last column classe. After pre-processing we use 'predict' function to apply pca on test and training data.
 
 preProc<- preProcess(training[, -60], method = "pca", thresh = 0.99)
 trainPC<-predict(preProc,training[,-60])
@@ -67,11 +67,24 @@ Now use random forest to train the model on training data using classe variable.
 
 modelFit<-randomForest(training$classe ~.,data=trainPC,importance=TRUE)
 
-We can visualize the confusion matrix and variable importance from below functions. We have attached principal component importance plot in princ
+####We can visualize the confusion matrix and variable importance from below functions. We have attached principal component importance plot in (prinComp.jpeg) file. The plot show principal componenets on Y-axis and accuracy in X-axis. Points with the highest accuracy are at the top.
 
 print(modelFit)
 importance(modelFit)
 varImpPlot(modelFit,sort=TRUE,main="principal components")
+
+#### For validating model on validation data and how the model actually fit we predict our result on validation data.
+pred_valid<-predict(modelFit,validPC)
+confusion<-confusionMatrix(validation$classe,pred_valid)
+confusion$table
+
+####To find how much accurate our prediction is , we check accuracy and out of sample error of our model on vaildation data. 
+accur <- postResample(validation$classe, pred_valid)
+outSamperror<-1-accur[[1]]
+
+The estimated accuracy of the model is 99.37% and the estimated out-of-sample error based on fitted model applied to the cross validation data is 0.63%.
+
+
 
 
 
